@@ -2,6 +2,7 @@ package com.weekendproject.connectivly.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.weekendproject.connectivly.payload.CustomerRequest;
@@ -21,7 +22,7 @@ public interface MasterService {
 
 	void updateCustomer(@Valid CustomerRequest jsonRequest, String name);
 
-	void saveSupplier(@Valid SupplierRequest jsonRequest, String decodeJwt);
+	void saveSupplier(@Valid SupplierRequest jsonRequest, String decodeJwt, HttpServletRequest request) throws Exception;
 
 	void updateSupplier(@Valid SupplierRequest jsonRequest, String decodeJwt);
 

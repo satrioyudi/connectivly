@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import com.weekendproject.connectivly.model.GrnPoProduct;
 import com.weekendproject.connectivly.payload.GoodReceivedNotesRequest;
 import com.weekendproject.connectivly.payload.GrnPoProductRequest;
+import com.weekendproject.connectivly.repository.GoodReceivedNotesRepository.GrnPoProduct2;
 
 public interface GoodReceivedNotesService {
 
@@ -17,5 +18,7 @@ public interface GoodReceivedNotesService {
 	void approveGoodReceivedNotes(@Valid GoodReceivedNotesRequest jsonRequest, String decodeJwt);
 
 	List<GrnPoProduct> findGrnPoProductByPO(@Valid GrnPoProductRequest jsonRequest, String decodeJwt);
+
+	List<GrnPoProduct2> findGrnPoProductByCode(@Valid GoodReceivedNotesRequest jsonRequest, String decodeJwt);
 
 }

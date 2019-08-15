@@ -21,5 +21,7 @@ public interface MasterRepository extends JpaRepository<Master, Long>, JpaSpecif
 
 	Optional<Master> findByCustomerCategory(String customerCategory);
 
+	Master findByCustomerCategory(Master customerCategory);
+
 
 }

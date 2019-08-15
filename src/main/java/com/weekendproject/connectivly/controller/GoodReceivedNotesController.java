@@ -24,6 +24,7 @@ import com.weekendproject.connectivly.payload.GrnPoProductRequest;
 import com.weekendproject.connectivly.payload.PurchaseOrdersRequest;
 import com.weekendproject.connectivly.repository.GoodReceivedNotesRepository;
 import com.weekendproject.connectivly.service.GoodReceivedNotesService;
+import com.weekendproject.connectivly.repository.GoodReceivedNotesRepository.GrnPoProduct2;
 
 
 @RestController
@@ -37,34 +38,39 @@ public class GoodReceivedNotesController {
 	
 	@PostMapping("/addGrnPoProduct")
 	public void addGrnPoProduct(@Valid @RequestBody GrnPoProductRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		goodReceivedNotesService.addGrnPoProduct(jsonRequest, JwtDecoder.decodeJwt(request));
+		goodReceivedNotesService.addGrnPoProduct(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/getAllGoodReceivedNotes")
     @ResponseStatus(HttpStatus.OK)
     public Page<GoodReceivedNotes> getAllGoodReceivedNotes(Pageable page, HttpServletRequest request) throws IOException, JSONException {
-		Page<GoodReceivedNotes> getAllGoodReceivedNotes = repository.findAllByUserId(page, JwtDecoder.decodeJwt(request)); 
+		Page<GoodReceivedNotes> getAllGoodReceivedNotes = repository.findAllByUserId(page, JwtDecoder.decodeJwt(request).get("userId")); 
         return getAllGoodReceivedNotes;
     }
 	
 	@PostMapping("/addGoodReceivedNotes")
 	public void addGoodReceivedNotes(@Valid @RequestBody GoodReceivedNotesRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		goodReceivedNotesService.addGoodReceivedNotes(jsonRequest, JwtDecoder.decodeJwt(request));
+		goodReceivedNotesService.addGoodReceivedNotes(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
-	@PostMapping("/editPurchaseOrder")
-	public void editPurchaseOrder(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-//		purchaseOrdersService.editPurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request));
+	@PostMapping("/editGoodReceivedNotes")
+	public void editGoodReceivedNotes(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
+//		goodReceivedNotesService.editGoodReceivedNotes(jsonRequest, JwtDecoder.decodeJwt(request));
 	}
 	
 	@PostMapping("/approveGoodReceivedNotes")
 	public void approveGoodReceivedNotes(@Valid @RequestBody GoodReceivedNotesRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		goodReceivedNotesService.approveGoodReceivedNotes(jsonRequest, JwtDecoder.decodeJwt(request));
+		goodReceivedNotesService.approveGoodReceivedNotes(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/findGrnPoProductByPO")
 	public List<GrnPoProduct> findGrnPoProductByPO(@Valid @RequestBody GrnPoProductRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		return goodReceivedNotesService.findGrnPoProductByPO(jsonRequest, JwtDecoder.decodeJwt(request));
+		return goodReceivedNotesService.findGrnPoProductByPO(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
+	}
+	
+	@PostMapping("/findGrnPoProductByCode")
+	public List<GrnPoProduct2> findGrnPoProductByCode(@Valid @RequestBody GoodReceivedNotesRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
+		return goodReceivedNotesService.findGrnPoProductByCode(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 }

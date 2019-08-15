@@ -23,7 +23,7 @@ public interface PurchaseOrdersRepository extends JpaRepository<PurchaseOrders, 
 
 	interface PurchaseOrderView{
 		Integer getId();
-		String getStatus();
+		Boolean getIsApproved();
 		Date getPoDate();
 		Date getApprovedAt();
 		String getPoNumber();
@@ -31,13 +31,13 @@ public interface PurchaseOrdersRepository extends JpaRepository<PurchaseOrders, 
 	    String getSupplier();
 	}
 	
-	@Query(value = "select po.id, (case when po.is_approved = true then 'Approved' else 'Pending' end) as status, po.po_date as poDate, po.po_number as poNumber, po.user_id as userId, po.supplier_id as supplier, po.approved_at as approvedAt "+
+	@Query(value = "select po.id, po.is_approved, po.po_date as poDate, po.po_number as poNumber, po.user_id as userId, po.supplier_id as supplier, po.approved_at as approvedAt "+
             "from purchase_orders po "+
             "inner join product_purchase_order ppo on po.id = ppo.purchase_order_id "+ 
-            "where ppo.deleted_at is null and po.user_id = :userId "+
-            "group by po.id, po.po_number, po.is_approved, po.po_date, po.user_id, po.supplier_id, po.approved_at", nativeQuery = true)
+            "where ppo.deleted_at is null and po.user_id = :userId and po.supplier_id = :supplierId and po.is_approved = false "+
+            "group by po.id, po.po_number, po.po_date, po.user_id, po.supplier_id, po.approved_at", nativeQuery = true)
 			
-	Page<PurchaseOrderView> getAllPurchaseOrder(Pageable page, @Param("userId") String userId);
+	Page<PurchaseOrderView> getAllPurchaseOrder(Pageable page, @Param("userId") String userId, @Param("supplierId") int supplierId);
 			
 	
 	interface PurchaseOrderViewDetail{
@@ -108,6 +108,7 @@ public interface PurchaseOrdersRepository extends JpaRepository<PurchaseOrders, 
 	List<PurchaseOrderViewDetail> viewPurchaseOrderDetail(@Param("userId") String userId, @Param("poNumber") String poNumber);
 
 	List<PurchaseOrders> findAllByIsApprovedTrueAndUserId(String decodeJwt);
+
 	
 
 }

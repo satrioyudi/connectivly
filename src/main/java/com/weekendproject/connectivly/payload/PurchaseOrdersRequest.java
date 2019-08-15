@@ -23,6 +23,10 @@ public class PurchaseOrdersRequest {
 		private String linkCode;
 		private String codeExpireDate;
 		private Master customerCategory;
+		private Double total;
+		private Double totalBeforeDiscount;
+		private Double globalDiscount;
+		private Double globalDiscountFlat;
 		
 		private List<ProductPurchaseOrder> ppoList;
 		public List<ProductPurchaseOrder> getPpoList() {
@@ -113,5 +117,17 @@ public class PurchaseOrdersRequest {
 		}
 		public String getPoNumber() {
 			return poNumber;
+		}
+		public Double getTotal() {
+			return total;
+		}
+		public Double getTotalBeforeDiscount() {
+			return totalBeforeDiscount;
+		}
+		public Double getGlobalDiscount() {
+			return globalDiscount;
+		}
+		public Double getGlobalDiscountFlat() {
+			return globalDiscountFlat;
 		}
 }

@@ -39,39 +39,39 @@ public class PurchaseOrdersController {
 	@Autowired
 	private PurchaseOrdersService purchaseOrdersService;
 	
-	@PostMapping("/getAllPurchaseOrder")
+	@GetMapping("/getAllPurchaseOrder")
     @ResponseStatus(HttpStatus.OK)
     public Page<PurchaseOrderView> getAllPurchaseOrder(Pageable page, HttpServletRequest request) throws IOException, JSONException {
-        return repository.getAllPurchaseOrder(page, JwtDecoder.decodeJwt(request));
+        return repository.getAllPurchaseOrder(page, JwtDecoder.decodeJwt(request).get("userId"), Integer.parseInt(JwtDecoder.decodeJwt(request).get("supplierId")));
     }
 	
 	@GetMapping("/getProductBySupplier")
     public Page<Products> getProductBySupplier(Pageable page, HttpServletRequest request) throws IOException, JSONException {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		Page<Products> getSupplier = productRepository.findAllByUserId(page, JwtDecoder.decodeJwt(request));
+		Page<Products> getSupplier = productRepository.findAllByUserId(page, JwtDecoder.decodeJwt(request).get("userId"));
         return getSupplier;
     }
 	
 	@PostMapping("/viewPurchaseOrderDetail")
     @ResponseStatus(HttpStatus.OK)
     public List<PurchaseOrderViewDetail> viewPurchaseOrderDetail(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException {
-        return repository.viewPurchaseOrderDetail(JwtDecoder.decodeJwt(request), jsonRequest.getPoNumber());
+        return repository.viewPurchaseOrderDetail(JwtDecoder.decodeJwt(request).get("userId"), jsonRequest.getPoNumber());
     }
 	
 	@PostMapping("/addPurchaseOrder")
 	public void addPurchaseOrder(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		purchaseOrdersService.addPurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request));
+		purchaseOrdersService.addPurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"), Integer.parseInt(JwtDecoder.decodeJwt(request).get("supplierId")));
 	}
 	
 	@PostMapping("/editPurchaseOrder")
 	public void editPurchaseOrder(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		purchaseOrdersService.editPurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request));
+		purchaseOrdersService.editPurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/approvePurchaseOrder")
 	public void approvePurchaseOrder(@Valid @RequestBody PurchaseOrdersRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
-		purchaseOrdersService.approvePurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request));
+		purchaseOrdersService.approvePurchaseOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/deletePurchaseOrder")
@@ -83,7 +83,7 @@ public class PurchaseOrdersController {
 	@GetMapping("/getListApprovedPO")
 	@ResponseStatus(HttpStatus.OK)
 	public List<PurchaseOrders> getListApprovedPO(HttpServletRequest request) throws IOException, JSONException {
-		List<PurchaseOrders> getListApprovedPO = repository.findAllByIsApprovedTrueAndUserId(JwtDecoder.decodeJwt(request));
+		List<PurchaseOrders> getListApprovedPO = repository.findAllByIsApprovedTrueAndUserId(JwtDecoder.decodeJwt(request).get("userId"));
 		return getListApprovedPO;
 	}
 

@@ -19,12 +19,6 @@ public class Supplier {
 	@Column(name = "name")
     private String name;
 	
-	@Column(name = "phone")
-	private String phone;
-	
-	@Column(name = "address")
-	private String address;
-	
 	@Column(name = "email")
 	private String email;
 	
@@ -34,71 +28,110 @@ public class Supplier {
 	@Column(name = "updated_at")
 	private Date updatedAt;
 	
+	@Column(name = "company_name")
+	private String companyName;
+	
+	@Column(name = "province")
+	private String province;
+	
+	@Column(name = "city")
+	private String city;
+	
+	@Column(name = "postal_code")
+	private String postalCode;
+	
 	@Column(name = "user_id")
 	private String userId;
+	
+	@Column(name = "measurement_id")
+	private Long measurementId;
 
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 	public String getEmail() {
 		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public Date getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-
 	public Date getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
 	}
 
 	public String getUserId() {
 		return userId;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
+
+	public Long getMeasurementId() {
+		return measurementId;
+	}
+
+	public void setMeasurementId(Long measurementId) {
+		this.measurementId = measurementId;
+	}
+
 }

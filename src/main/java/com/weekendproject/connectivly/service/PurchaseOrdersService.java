@@ -3,17 +3,13 @@ package com.weekendproject.connectivly.service;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import com.weekendproject.connectivly.model.PurchaseOrders;
 import com.weekendproject.connectivly.payload.PurchaseOrdersRequest;
 
 public interface PurchaseOrdersService {
 
-    Page<PurchaseOrders> findAllByUserId(Long id, Pageable pageRequest);
+//    Page<PurchaseOrders> findAllByUserId(Long id, Pageable pageRequest);
 
-	void addPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName);
+	void addPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName, int supplierId);
 
 	void editPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String decodeJwt);
 

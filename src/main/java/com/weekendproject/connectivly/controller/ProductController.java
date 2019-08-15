@@ -45,35 +45,35 @@ public class ProductController {
 //		String userName = principal.getName();
 		System.out.println(">>>>>>>>>>>>>>>>>>");
 		System.out.println("user login : "+JwtDecoder.decodeJwt(request));
-        return repository.findAllByUserIdAndDeletedAtIsNull(page, JwtDecoder.decodeJwt(request));
+        return repository.findAllByUserIdAndDeletedAtIsNull(page, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/saveProduct")
     @ResponseStatus(HttpStatus.OK)
     public void saveProduct(@Valid @RequestBody ProductRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
-		service.saveProduct(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.saveProduct(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/updateProduct")
 	@ResponseStatus(HttpStatus.OK)
 	public void updateProduct(@Valid @RequestBody ProductRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
-		service.updateProduct(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.updateProduct(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/modifikasiStok")
 	@ResponseStatus(HttpStatus.OK)
 	public void modifikasiStok(@Valid @RequestBody ProductRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
-		service.modifikasiStok(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.modifikasiStok(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/deleteProduct")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteProduct(@Valid @RequestBody ProductRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
-		service.deleteProduct(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.deleteProduct(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/historyProduct")
@@ -81,6 +81,6 @@ public class ProductController {
 	public List<ProductHistory> historyProduct(@Valid @RequestBody ProductHistoryRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 		System.out.println(jsonRequest.getProductId());
-		return prodHistoryRepository.findAllByProductIdAndUserId(jsonRequest.getProductId(), JwtDecoder.decodeJwt(request));
+		return prodHistoryRepository.findAllByProductIdAndUserId(jsonRequest.getProductId(), JwtDecoder.decodeJwt(request).get("userId"));
 	}
 }

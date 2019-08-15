@@ -60,7 +60,7 @@ public class MasterController {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
 //		String userName = "dev@dev.com";
-		List<Object> allMaster = service.getMaster(menu, JwtDecoder.decodeJwt(request));
+		List<Object> allMaster = service.getMaster(menu, JwtDecoder.decodeJwt(request).get("userId"));
         return allMaster;
     }
 	
@@ -69,7 +69,7 @@ public class MasterController {
     public void saveMaster(@Valid @RequestBody MasterRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.saveMaster(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.saveMaster(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/updateMaster")
@@ -77,21 +77,21 @@ public class MasterController {
 	public void updateMaster(@Valid @RequestBody MasterRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.updateMaster(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.updateMaster(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/deleteMaster")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteMaster(@Valid @RequestBody MasterRequest jsonRequest, HttpServletRequest request) throws Exception {
 		repository.deleteById(jsonRequest.getId());
-		logService.createLog("deleteMaster", new Date(),jsonRequest.getMasterCode(), JwtDecoder.decodeJwt(request));
+		logService.createLog("deleteMaster", new Date(),jsonRequest.getMasterCode(), JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@GetMapping("/getCustomer")
     public List<Customers> getCustomer(Pageable page, HttpServletRequest request) throws IOException, JSONException {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		List<Customers> getCustomer = cusRepository.findAllByUserId(JwtDecoder.decodeJwt(request));
+		List<Customers> getCustomer = cusRepository.findAllByUserId(JwtDecoder.decodeJwt(request).get("userId"));
         return getCustomer;
     }
 	
@@ -100,7 +100,7 @@ public class MasterController {
     public void saveCustomer(@Valid @RequestBody CustomerRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.saveCustomer(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.saveCustomer(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/updateCustomer")
@@ -108,21 +108,21 @@ public class MasterController {
 	public void updateCustomer(@Valid @RequestBody CustomerRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.updateCustomer(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.updateCustomer(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/deleteCustomer")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteCustomer(@Valid @RequestBody CustomerRequest jsonRequest, HttpServletRequest request) throws Exception {
 		repository.deleteById(jsonRequest.getId());
-		logService.createLog("deleteCustomer", new Date(),jsonRequest.getName(), JwtDecoder.decodeJwt(request));
+		logService.createLog("deleteCustomer", new Date(),jsonRequest.getName(), JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@GetMapping("/getSupplier")
     public List<Supplier> getSupplier(Pageable page, HttpServletRequest request) throws IOException, JSONException {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		List<Supplier> getSupplier = supRepository.findAllByUserId(JwtDecoder.decodeJwt(request));
+		List<Supplier> getSupplier = supRepository.findAllByUserId(JwtDecoder.decodeJwt(request).get("userId"));
         return getSupplier;
     }
 	
@@ -132,7 +132,7 @@ public class MasterController {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
 		System.out.println("token : "+request.getHeader("authorization"));
-		service.saveSupplier(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.saveSupplier(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"), request);
     }
 	
 	@PostMapping("/updateSupplier")
@@ -140,14 +140,14 @@ public class MasterController {
     public void updateSupplier(@Valid @RequestBody SupplierRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.updateSupplier(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.updateSupplier(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/deleteSupplier")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteSupplier(@Valid @RequestBody SupplierRequest jsonRequest, HttpServletRequest request) throws Exception {
 		supRepository.deleteById(jsonRequest.getId());
-		logService.createLog("deleteSupplier", new Date(),jsonRequest.getName(), JwtDecoder.decodeJwt(request));
+		logService.createLog("deleteSupplier", new Date(),jsonRequest.getUsername(), JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@PostMapping("/saveExtraCost")
@@ -155,7 +155,7 @@ public class MasterController {
     public void saveExtraCost(@Valid @RequestBody ExtraCostRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.saveExtraCost(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.saveExtraCost(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/updateExtraCost")
@@ -163,21 +163,21 @@ public class MasterController {
     public void updateExtraCost(@Valid @RequestBody ExtraCostRequest jsonRequest, HttpServletRequest request) throws Exception {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		service.updateExtraCost(jsonRequest, JwtDecoder.decodeJwt(request));
+		service.updateExtraCost(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
 	@PostMapping("/deleteExtraCost")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteExtraCost(@Valid @RequestBody ExtraCostRequest jsonRequest, HttpServletRequest request) throws Exception {
 		ecRepository.deleteById(jsonRequest.getId());
-		logService.createLog("deleteExtraCost", new Date(),jsonRequest.getName(), JwtDecoder.decodeJwt(request));
+		logService.createLog("deleteExtraCost", new Date(),jsonRequest.getName(), JwtDecoder.decodeJwt(request).get("userId"));
 	}
 	
 	@GetMapping("/getExtraCost")
     public List<ExtraCost> getExtraCost(Pageable page, HttpServletRequest request) throws IOException, JSONException {
 //		Principal principal = request.getUserPrincipal();
 //		String userName = principal.getName();
-		List<ExtraCost> getExtraCost = ecRepository.findAllByUserId(JwtDecoder.decodeJwt(request));
+		List<ExtraCost> getExtraCost = ecRepository.findAllByUserId(JwtDecoder.decodeJwt(request).get("userId"));
         return getExtraCost;
     }
 }

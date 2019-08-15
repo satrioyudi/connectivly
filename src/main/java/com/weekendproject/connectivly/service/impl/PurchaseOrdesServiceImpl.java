@@ -10,16 +10,18 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.weekendproject.connectivly.model.ProductPurchaseOrder;
 import com.weekendproject.connectivly.model.PurchaseOrders;
+import com.weekendproject.connectivly.model.SalesOrder;
 import com.weekendproject.connectivly.model.SeqNumber;
 import com.weekendproject.connectivly.payload.PurchaseOrdersRequest;
+import com.weekendproject.connectivly.repository.CustomersRepository;
+import com.weekendproject.connectivly.repository.MasterRepository;
 import com.weekendproject.connectivly.repository.ProductPurchaseOrderRepository;
 import com.weekendproject.connectivly.repository.PurchaseOrdersRepository;
+import com.weekendproject.connectivly.repository.SalesOrderRepository;
 import com.weekendproject.connectivly.repository.SeqNumberRepository;
 import com.weekendproject.connectivly.service.LogService;
 import com.weekendproject.connectivly.service.PurchaseOrdersService;
@@ -38,13 +40,23 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 	@Autowired
 	private SeqNumberRepository seqRepository;
 	
-    public Page<PurchaseOrders> findAllByUserId(Long userId, Pageable pageRequest) {
-        return repository.findAllByUserId(userId, pageRequest);
+	@Autowired
+	private SalesOrderRepository soRepository;
 
-    }
+	@Autowired
+	private MasterRepository masterRepository;
+
+	@Autowired
+	private CustomersRepository cusRepository;
+	
+//    public Page<PurchaseOrders> findAllByUserId(Long userId, Pageable pageRequest) {
+//        return repository.findAllByUserId(userId, pageRequest);
+//
+//    }
 
 	@Override
-	public void addPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName) {
+	public void addPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName, int supplierId) {
+		System.out.println("jso "+jsonRequest.getTotal());
 		PurchaseOrders po = new PurchaseOrders();
 		po.setPoNumber(generatePoNumber());
 		po.setPoDate(new Date());
@@ -53,6 +65,26 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 		po.setCreatedAt(new Date());
 		
 		repository.save(po);
+		
+		SalesOrder so = new SalesOrder();
+		so.setCode(generateSONumber());
+		so.setTotal(jsonRequest.getTotal());
+		so.setTotalBeforeDiscount(jsonRequest.getTotalBeforeDiscount());
+		so.setGlobalDiscount(jsonRequest.getGlobalDiscount());
+		so.setGlobalDiscountFlat(jsonRequest.getGlobalDiscountFlat());
+		so.setIsLinked("NO");
+		so.setPoCode(po.getPoNumber());
+		so.setSoDate(new Date());
+		so.setIsApproved(false);
+		so.setIsDelivered(false);
+		so.setIsOverride(false);
+		so.setIsReady(false);
+//		System.out.println("jsonRequest.getCustomerCategory() "+jsonRequest.getCustomerCategory());
+//		Master master = masterRepository.findByCustomerCategory(jsonRequest.getCustomerCategory());
+//		Optional<Customers> cus = cusRepository.findById(master.getId());
+		Long l = new Long(supplierId);
+		so.setCustomerId(l);
+		soRepository.save(so);
 		
 		List<ProductPurchaseOrder> purchasedList = new ArrayList<>();
 		if (jsonRequest.getPpoList().size() > 0) {
@@ -78,9 +110,6 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 	}
 
 	private String generatePoNumber() {
-//		AtomicInteger seq = new AtomicInteger();
-//		int nextVal = seq.incrementAndGet();
-		
 		Date date = new Date();
 		LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		
@@ -93,9 +122,9 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 		if (seqRepository.findTopByCodeOrderByIdDesc("po") != null) {
 			
 			if (seqRepository.findTopByCodeOrderByIdDesc("po").getSeqId() >= 10) {
-				sb.append("000");
-			} else {
 				sb.append("00");
+			} else {
+				sb.append("0");
 			}
 			num = seqRepository.findTopByCodeOrderByIdDesc("po").getSeqId()+1;
 		} else {
@@ -110,6 +139,44 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 		seqRepository.save(seqNum);
 		
 		System.out.println("PO Number : " + sb);
+		return sb.toString();
+	}
+	
+	private String generateSONumber() {
+//		AtomicInteger seq = new AtomicInteger();
+//		int nextVal = seq.incrementAndGet();
+		
+		Date date = new Date();
+		LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		
+		long num = 0;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("SO-");
+		sb.append(localDate.getYear());
+		sb.append("-");
+		if (seqRepository.findTopByCodeOrderByIdDesc("so") != null) {
+			
+			if (seqRepository.findTopByCodeOrderByIdDesc("so").getSeqId() >= 10) {
+				sb.append("00");
+			} else if (seqRepository.findTopByCodeOrderByIdDesc("so").getSeqId() >= 100) {
+				sb.append("0");
+			} else {
+				sb.append("000");
+			}
+			num = seqRepository.findTopByCodeOrderByIdDesc("so").getSeqId()+1;
+		} else {
+			sb.append("000");
+			num = 1;
+		}
+		sb.append(num);
+		
+		SeqNumber seqNum = new SeqNumber();
+		seqNum.setSeqId(num);
+		seqNum.setCode("so");
+		seqRepository.save(seqNum);
+		
+		System.out.println("SO Number : " + sb);
 		return sb.toString();
 	}
 
@@ -147,6 +214,11 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 	@Override
 	public void approvePurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName) {
 		PurchaseOrders po = repository.findByPoNumber(jsonRequest.getPoNumber());
+		
+		SalesOrder so = soRepository.findByPoCode(po.getPoNumber());
+		so.setIsLinked("YES");
+		soRepository.save(so);
+		
 		po.setApprovedAt(new Date());
 		po.setIsApproved(true);
 		po.setUserId(userName);

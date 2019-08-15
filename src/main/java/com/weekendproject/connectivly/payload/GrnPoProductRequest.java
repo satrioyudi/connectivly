@@ -1,6 +1,9 @@
 package com.weekendproject.connectivly.payload;
 
 import java.util.Date;
+import java.util.List;
+
+import com.weekendproject.connectivly.model.GrnPoProduct;
 
 public class GrnPoProductRequest {
 	private Long id;
@@ -23,6 +26,7 @@ public class GrnPoProductRequest {
 	private Date userId;
 	private Double sellingPrice;
 	private Double sellingPercent;
+	private List<GrnPoProduct> grnPoList;
 	
 	public Long getId() {
 		return id;
@@ -83,5 +87,8 @@ public class GrnPoProductRequest {
 	}
 	public Double getSellingPercent() {
 		return sellingPercent;
+	}
+	public List<GrnPoProduct> getGrnPoList() {
+		return grnPoList;
 	}
 }

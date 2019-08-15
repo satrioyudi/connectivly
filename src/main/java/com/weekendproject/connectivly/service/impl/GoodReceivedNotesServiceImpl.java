@@ -2,6 +2,7 @@ package com.weekendproject.connectivly.service.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.weekendproject.connectivly.model.SeqNumber;
 import com.weekendproject.connectivly.payload.GoodReceivedNotesRequest;
 import com.weekendproject.connectivly.payload.GrnPoProductRequest;
 import com.weekendproject.connectivly.repository.GoodReceivedNotesRepository;
+import com.weekendproject.connectivly.repository.GoodReceivedNotesRepository.GrnPoProduct2;
 import com.weekendproject.connectivly.repository.GrnPoProductRepository;
 import com.weekendproject.connectivly.repository.SeqNumberRepository;
 import com.weekendproject.connectivly.service.GoodReceivedNotesService;
@@ -37,24 +39,34 @@ public class GoodReceivedNotesServiceImpl implements GoodReceivedNotesService{
 	
 	@Override
 	public void addGrnPoProduct(@Valid GrnPoProductRequest jsonRequest, String userName) {
-		GrnPoProduct grnPo = new GrnPoProduct();
-		grnPo.setGoodReceivedNoteId(jsonRequest.getGoodReceivedNoteId());
-		grnPo.setPurchaseOrderId(jsonRequest.getPurchaseOrderId());
-		grnPo.setProductId(jsonRequest.getProductId());
-		grnPo.setPoNumber(jsonRequest.getPoNumber());
-		grnPo.setItemCost(jsonRequest.getItemCost());
-		grnPo.setPercent1(jsonRequest.getPercent1());
-		grnPo.setPercent2(jsonRequest.getPercent2());
-		grnPo.setQuantity(jsonRequest.getQuantity());
-		grnPo.setReal(jsonRequest.getReal());
-		grnPo.setSellingPercent(jsonRequest.getSellingPercent());
-		grnPo.setSellingPrice(jsonRequest.getSellingPrice());
-		grnPo.setTotal(jsonRequest.getTotal());
-		grnPo.setUserId(userName);
-		grnPo.setCreatedAt(new Date());
-		grnRepository.save(grnPo);
+		List<GrnPoProduct> grnPayloadList = jsonRequest.getGrnPoList();
+		List<GrnPoProduct> list = new ArrayList<GrnPoProduct>();
+		if (grnPayloadList.size() > 0) {
+			for (GrnPoProduct grnPoProduct : grnPayloadList) {
+				GrnPoProduct grnPo = new GrnPoProduct();
+				grnPo.setGoodReceivedNoteId(grnPoProduct.getGoodReceivedNoteId());
+				grnPo.setPurchaseOrderId(grnPoProduct.getPurchaseOrderId());
+				grnPo.setProductId(grnPoProduct.getProductId());
+				grnPo.setPoNumber(grnPoProduct.getPoNumber());
+				grnPo.setItemCost(grnPoProduct.getItemCost());
+				grnPo.setPercent1(grnPoProduct.getPercent1());
+				grnPo.setPercent2(grnPoProduct.getPercent2());
+				grnPo.setQuantity(grnPoProduct.getQuantity());
+				grnPo.setReal(grnPoProduct.getReal());
+				grnPo.setSellingPercent(grnPoProduct.getSellingPercent());
+				grnPo.setSellingPrice(grnPoProduct.getSellingPrice());
+				grnPo.setTotal(grnPoProduct.getTotal());
+				grnPo.setUserId(userName);
+				grnPo.setCreatedAt(new Date());
+				list.add(grnPo);
+			}
+		}
 		
-		logService.createLog("addGrnPoProduct", new Date(), grnPo.getId().toString(), userName);
+		if (list.size() > 0) {
+			grnRepository.saveAll(list);
+			logService.createLog("addGrnPoProduct", new Date(), list.get(0).getId().toString(), userName);
+		}
+		
 	}
 	
 	@Override
@@ -127,6 +139,11 @@ public class GoodReceivedNotesServiceImpl implements GoodReceivedNotesService{
 		List<GrnPoProduct> gppList = grnRepository.findAllByPoNumber(jsonRequest.getPoNumber());
 		return gppList;
 	}
-
+	
+	@Override
+	public List<GrnPoProduct2> findGrnPoProductByCode(@Valid GoodReceivedNotesRequest jsonRequest, String decodeJwt) {
+		List<GrnPoProduct2> list = repository.findGrnPoProductByCode(jsonRequest.getCode());
+		return list;
+	}
 	
 }

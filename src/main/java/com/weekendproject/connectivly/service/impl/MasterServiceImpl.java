@@ -1,5 +1,11 @@
 package com.weekendproject.connectivly.service.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +148,6 @@ public class MasterServiceImpl implements MasterService{
 		cus.setUserId(name);
 		cus.setCreatedAt(new Date());
 		
-//		Optional<Master> oneById = repository.findByCustomerCategory(jsonRequest.getCustomerCategory().getCustomerCategory());
 		Optional<Master> oneById = repository.findById(jsonRequest.getCustomerCategoryId());
 		if (oneById.isPresent()) {
 			Master master = oneById.get();
@@ -186,18 +192,72 @@ public class MasterServiceImpl implements MasterService{
 	}
 
 	@Override
-	public void saveSupplier(@Valid SupplierRequest jsonRequest, String name) {
+	public void saveSupplier(@Valid SupplierRequest jsonRequest, String name, HttpServletRequest request) throws Exception {
 		Supplier supplier = new Supplier();
-		supplier.setName(jsonRequest.getName());
-		supplier.setAddress(jsonRequest.getAddress());
-		supplier.setPhone(jsonRequest.getPhone());
+		supplier.setName(jsonRequest.getFullName());
 		supplier.setEmail(jsonRequest.getEmail());
 		supplier.setCreatedAt(new Date());
 		supplier.setUserId(name);
-		
+		supplier.setCity(jsonRequest.getCity());
+		supplier.setCompanyName(jsonRequest.getCompanyName());
+		supplier.setPostalCode(jsonRequest.getPostalCode());
+		supplier.setProvince(jsonRequest.getProvince());
+		supplier.setMeasurementId(jsonRequest.getMeasurementId());
 		supRepository.save(supplier);
-		
 		logService.createLog("saveSupplier", new Date(),jsonRequest.toString(), name);
+		
+		if (supplier.getId() != null) {
+			
+			URL obj = new URL("http://35.240.217.201/auth/user/createUser");
+			
+			URLConnection connection = obj.openConnection();
+			HttpURLConnection con = (HttpURLConnection) connection;
+			
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Authorization", request.getHeader("authorization").toString());
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setDoOutput(true);
+			con.setReadTimeout(1000);
+			
+			try {
+				
+			
+				StringBuilder sb = new StringBuilder();
+				sb.append("{\"username\": \"");
+				sb.append(""+jsonRequest.getUsername()+"\"");
+				sb.append(",\"password\": \"");
+				sb.append(""+jsonRequest.getPassword()+"\"");
+				sb.append(",\"email\": \"");
+				sb.append(""+jsonRequest.getEmail()+"\"");
+				sb.append(",\"fullName\": \"");
+				sb.append(""+jsonRequest.getFullName()+"\"");
+				sb.append(",\"roleId\": ");
+				sb.append(jsonRequest.getRoleId());
+				sb.append(",\"supplierId\": ");
+				sb.append(supplier.getId()+"}");
+				
+				String jsonInputString = sb.toString();
+				
+				try(OutputStream os = con.getOutputStream()) {
+					byte[] input = jsonInputString.getBytes("utf-8");
+					os.write(input, 0, input.length);           
+				}
+				
+	//			int code = con.getResponseCode();
+				
+				try(BufferedReader br = new BufferedReader(
+						new InputStreamReader(con.getInputStream(), "utf-8"))) {
+					StringBuilder response = new StringBuilder();
+					String responseLine = null;
+					while ((responseLine = br.readLine()) != null) {
+						response.append(responseLine.trim());
+					}
+				}
+			
+			} catch (Exception e) {
+				throw new Exception(e.getMessage());
+			}
+		}
 	}
 
 	@Override
@@ -205,15 +265,18 @@ public class MasterServiceImpl implements MasterService{
 		Optional<Supplier> oneById = supRepository.findById(jsonRequest.getId());
 		if (oneById.isPresent()) {
 			Supplier supplier = oneById.get();
-			supplier.setName(jsonRequest.getName());
-			supplier.setAddress(jsonRequest.getAddress());
-			supplier.setPhone(jsonRequest.getPhone());
+			supplier.setName(jsonRequest.getFullName());
 			supplier.setEmail(jsonRequest.getEmail());
-			supplier.setUserId(name);
 			supplier.setUpdatedAt(new Date());
+			supplier.setUserId(name);
+			supplier.setCity(jsonRequest.getCity());
+			supplier.setCompanyName(jsonRequest.getCompanyName());
+			supplier.setPostalCode(jsonRequest.getPostalCode());
+			supplier.setProvince(jsonRequest.getProvince());
+			supplier.setMeasurementId(jsonRequest.getMeasurementId());
 			supRepository.save(supplier);
 			
-			logService.createLog("updateMaster", new Date(),jsonRequest.toString(), name);
+			logService.createLog("updateSupplier", new Date(),jsonRequest.toString(), name);
 		}
 		
 	}

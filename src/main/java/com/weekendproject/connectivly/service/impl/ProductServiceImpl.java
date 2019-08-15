@@ -8,8 +8,10 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.weekendproject.connectivly.model.ProductHistory;
 import com.weekendproject.connectivly.model.Products;
 import com.weekendproject.connectivly.payload.ProductRequest;
+import com.weekendproject.connectivly.repository.ProductHistoryRepository;
 import com.weekendproject.connectivly.repository.ProductRepository;
 import com.weekendproject.connectivly.service.LogService;
 import com.weekendproject.connectivly.service.ProductService;
@@ -21,6 +23,9 @@ public class ProductServiceImpl implements ProductService{
 	
 	@Autowired
 	private LogService logService;
+	
+	@Autowired
+	private ProductHistoryRepository productHistoryRepository;
 
 	@Override
 	public void saveProduct(@Valid ProductRequest jsonRequest, String name) {
@@ -76,6 +81,35 @@ public class ProductServiceImpl implements ProductService{
 			products.setQty(jsonRequest.getQty());
 			
 			repository.save(products);
+			
+			Integer prevDefect = products.getDefect();
+			Integer prevQty = products.getQty();
+			Long productId = products.getId();
+			String productName = products.getName();					
+			
+			ProductHistory ph = new ProductHistory();
+			ph.setMutator("Stock Modifier");
+			ph.setCode("-");
+			ph.setCreatedAt(new Date());
+			ph.setCreatedBy(name);
+			ph.setDefectStock(null);
+			ph.setDirectSalesId(null);
+			ph.setGoodReceivedNoteId(null);
+			ph.setNote("modifikasiStok");
+			ph.setPreviousDefect(prevDefect);
+			ph.setPreviousQty(prevQty);
+			ph.setProductId(productId);
+			ph.setProductName(productName);
+			ph.setPurchaseOrderId(null);
+			ph.setPurchaseReturnId(null);
+			ph.setRemains(prevQty - jsonRequest.getQty());
+			ph.setSalesOrderId(null);
+			ph.setSalesReturnId(null);
+			ph.setStatus(prevQty > jsonRequest.getQty() ? "Increment" : "Decrement");
+			ph.setUpdatedAt(null);
+			ph.setUserId(name);
+			ph.setValue(0);   
+			productHistoryRepository.save(ph);
 			
 			logService.createLog("modifikasiStok", new Date(), products.getId().toString(), name);
 		}
