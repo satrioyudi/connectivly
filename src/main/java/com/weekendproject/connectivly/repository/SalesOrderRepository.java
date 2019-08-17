@@ -1,5 +1,7 @@
 package com.weekendproject.connectivly.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +16,7 @@ public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long>, J
 
 	SalesOrder findByPoCode(String poNumber);
 
-	SalesOrder findByCode(String code);
+	Optional<SalesOrder> findByCode(String code);
 
 	Page<SalesOrder> findAllByUserIdAndIsLinkedAndIsApproved(Pageable page, String string, String string2, boolean b);
 

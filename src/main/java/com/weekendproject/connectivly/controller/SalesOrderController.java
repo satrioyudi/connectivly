@@ -43,6 +43,13 @@ public class SalesOrderController {
 		service.saveSalesOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
     }
 	
+	@PostMapping("/editSalesOrder")
+	@ResponseStatus(HttpStatus.OK)
+	public void editSalesOrder(@Valid @RequestBody SalesOrderRequest jsonRequest, HttpServletRequest request) throws Exception {
+//		Principal principal = request.getUserPrincipal();
+		service.editSalesOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
+	}
+	
 	@PostMapping("/approveSalesOrder")
 	@ResponseStatus(HttpStatus.OK)
 	public void approveSalesOrder(@Valid @RequestBody SalesOrderRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{

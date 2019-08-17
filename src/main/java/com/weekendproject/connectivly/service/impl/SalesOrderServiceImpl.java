@@ -2,6 +2,7 @@ package com.weekendproject.connectivly.service.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -146,13 +147,113 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 
 	@Override
 	public void approveSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId) {
-		SalesOrder so = repository.findByCode(jsonRequest.getCode());
-		so.setApprovedAt(new Date());
-		so.setIsApproved(true);
+		Optional<SalesOrder> oneByCode = repository.findByCode(jsonRequest.getCode());
+		if (oneByCode.isPresent()) {
+			SalesOrder so = oneByCode.get();
+			so.setApprovedAt(new Date());
+			so.setIsApproved(true);
+			
+			repository.save(so);
+			
+			logService.createLog("approveSalesOrder", new Date(), jsonRequest.getCode(), userId);
+		}
+	}
+
+	@Override
+	public void editSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId) throws Exception {
+		if (jsonRequest.getSopList().size() > 0) {
+			List<SalesOrderProduct> sopList = jsonRequest.getSopList();
+			
+			List<SalesOrderProduct> list = new ArrayList<SalesOrderProduct>();
+			
+			for (SalesOrderProduct salesOrderProduct2 : sopList) {
+				
+				Optional<SalesOrderProduct> oneById = sopRepository.findById(salesOrderProduct2.getId());
+				if (oneById.isPresent()) {
+					SalesOrderProduct sop = oneById.get();
+					sop.setUpdatedAt(new Date());
+					sop.setPercent1(salesOrderProduct2.getPercent1());
+					sop.setPercent2(salesOrderProduct2.getPercent2());
+					sop.setPrice(salesOrderProduct2.getPrice());
+					sop.setProductId(salesOrderProduct2.getProductId());
+					
+					Optional<Products> oneByid2 = prodRepository.findById(salesOrderProduct2.getProductId());
+					if (oneByid2.isPresent()) {
+						Products product = oneByid2.get();
+						if (product.getQty()-salesOrderProduct2.getQuantity() < 0) {
+							throw new Exception("Stock kurang dari 0");
+						}
+						product.setQty(product.getQty()-salesOrderProduct2.getQuantity());
+						prodRepository.save(product);
+						
+						sop.setAvailableQty(product.getQty()-salesOrderProduct2.getQuantity());
+					}
+					
+					sop.setQuantity(salesOrderProduct2.getQuantity());
+					sop.setSalesOrderId(salesOrderProduct2.getSalesOrderId());
+					sop.setTotal(salesOrderProduct2.getTotal());
+					sop.setUpdatedAt(salesOrderProduct2.getUpdatedAt());
+					sop.setUserId(userId);
+					
+					list.add(sop);
+				} else {
+					SalesOrderProduct sop = new SalesOrderProduct();
+					sop.setCode(jsonRequest.getCode());
+					
+					sop.setCreatedAt(new Date());
+					sop.setPercent1(salesOrderProduct2.getPercent1());
+					sop.setPercent2(salesOrderProduct2.getPercent2());
+					sop.setPrice(salesOrderProduct2.getPrice());
+					sop.setProductId(salesOrderProduct2.getProductId());
+					
+					Optional<Products> oneByid = prodRepository.findById(salesOrderProduct2.getProductId());
+					if (oneByid.isPresent()) {
+						Products product = oneByid.get();
+						if (product.getQty()-salesOrderProduct2.getQuantity() < 0) {
+							throw new Exception("Stock kurang dari 0");
+						}
+						product.setQty(product.getQty()-salesOrderProduct2.getQuantity());
+						prodRepository.save(product);
+						
+						sop.setAvailableQty(product.getQty()-salesOrderProduct2.getQuantity());
+					}
+					
+					sop.setQuantity(salesOrderProduct2.getQuantity());
+					sop.setSalesOrderId(salesOrderProduct2.getSalesOrderId());
+					sop.setTotal(salesOrderProduct2.getTotal());
+					sop.setUpdatedAt(salesOrderProduct2.getUpdatedAt());
+					sop.setUserId(userId);
+					
+					list.add(sop);
+				}
+			}
+			
+			sopRepository.saveAll(list);
+		}
 		
-		repository.save(so);
-		
-		logService.createLog("approveSalesOrder", new Date(), jsonRequest.getCode(), userId);
+		Optional<SalesOrder> oneByCode = repository.findByCode(jsonRequest.getCode());
+		if (oneByCode.isPresent()) {
+			SalesOrder so = oneByCode.get();
+			so.setBonusOnlineOrder(jsonRequest.getBonusOnlineOrder());
+			so.setUpdatedAt(new Date());
+			so.setCustomerId(jsonRequest.getCustomerId());
+			so.setEmployeeId(jsonRequest.getEmployeeId());
+			so.setGlobalDiscount(jsonRequest.getGlobalDiscount());
+			so.setGlobalDiscountFlat(jsonRequest.getGlobalDiscountFlat());
+			so.setIsApproved(false);
+			so.setIsDelivered(false);
+			so.setIsLinked("YES");
+			so.setIsOverride(false);
+			so.setIsReady(jsonRequest.getIsReady());
+			so.setSaleRepresentativeId(jsonRequest.getSaleRepresentativeId());
+			so.setTotal(jsonRequest.getTotal());
+			so.setTotalBeforeDiscount(jsonRequest.getTotalBeforeDiscount());
+			so.setUserId(userId);
+			so.setIsLinked("YES");
+			
+			repository.save(so);
+		}
+		logService.createLog("editSalesOrder", new Date(), jsonRequest.getCode(), userId);
 	}
 
 	

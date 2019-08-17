@@ -10,4 +10,6 @@ public interface SalesOrderService {
 
 	void approveSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId);
 
+	void editSalesOrder(@Valid SalesOrderRequest jsonRequest, String string) throws Exception;
+
 }
