@@ -11,6 +11,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.weekendproject.connectivly.model.Products;
 import com.weekendproject.connectivly.model.SalesOrder;
@@ -42,6 +43,7 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 	private ProductRepository prodRepository;
 	
 	@Override
+	@Transactional
 	public void saveSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId) throws Exception {
 		String soCode = generateSONumber();
 		if (jsonRequest.getSopList().size() > 0) {
@@ -160,6 +162,7 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 	}
 
 	@Override
+	@Transactional
 	public void editSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId) throws Exception {
 		if (jsonRequest.getSopList().size() > 0) {
 			List<SalesOrderProduct> sopList = jsonRequest.getSopList();

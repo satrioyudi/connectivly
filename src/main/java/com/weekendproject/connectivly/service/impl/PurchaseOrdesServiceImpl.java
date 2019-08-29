@@ -11,6 +11,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.weekendproject.connectivly.model.ProductPurchaseOrder;
 import com.weekendproject.connectivly.model.PurchaseOrders;
@@ -55,6 +56,7 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 //    }
 
 	@Override
+	@Transactional
 	public void addPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName, int supplierId) {
 		System.out.println("jso "+jsonRequest.getTotal());
 		PurchaseOrders po = new PurchaseOrders();
@@ -181,6 +183,7 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 	}
 
 	@Override
+	@Transactional
 	public void editPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName) {
 		PurchaseOrders po = repository.findByPoNumber(jsonRequest.getPoNumber());
 		po.setUpdatedAt(new Date());
@@ -212,6 +215,7 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 	}
 
 	@Override
+	@Transactional
 	public void approvePurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String userName) {
 		PurchaseOrders po = repository.findByPoNumber(jsonRequest.getPoNumber());
 		
