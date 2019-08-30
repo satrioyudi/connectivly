@@ -1,6 +1,7 @@
 package com.weekendproject.connectivly.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,13 @@ public class PurchaseOrdersController {
     public Page<PurchaseOrderView> getAllPurchaseOrder(Pageable page, HttpServletRequest request) throws IOException, JSONException {
         return repository.getAllPurchaseOrder(page, JwtDecoder.decodeJwt(request).get("userId"), Integer.parseInt(JwtDecoder.decodeJwt(request).get("supplierId")));
     }
+
+	@PostMapping("/getApprovedPurchaseOrder")
+	@ResponseStatus(HttpStatus.OK)
+	public HashMap getApprovedPurchaseOrder(@Valid @RequestBody PurchaseOrdersRequest jsonRequest) throws IOException, JSONException {
+		HashMap getListApprovedPO = purchaseOrdersService.findApprovedPurchaseOrder(jsonRequest);
+		return getListApprovedPO;
+	}
 	
 	@GetMapping("/getProductBySupplier")
     public Page<Products> getProductBySupplier(Pageable page, HttpServletRequest request) throws IOException, JSONException {

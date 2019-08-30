@@ -2,10 +2,7 @@ package com.weekendproject.connectivly.service.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.validation.Valid;
 
@@ -230,5 +227,16 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 		repository.save(po);
 		logService.createLog("approvePurchaseOrder", new Date(), po.getPoNumber(), userName);
 	}
-	
+
+	public HashMap findApprovedPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest) {
+		List<PurchaseOrders> po = repository.findAllByIsApprovedTrueAndUserId(jsonRequest.getUserId());
+		HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> map1 = new HashMap<>();
+		map.put("result", po);
+		map.put("size", po.size());
+		map1.put("data",map);
+		return map1;
+	}
+
+
 }

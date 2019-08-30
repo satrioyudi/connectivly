@@ -5,6 +5,8 @@ import javax.validation.Valid;
 
 import com.weekendproject.connectivly.payload.PurchaseOrdersRequest;
 
+import java.util.HashMap;
+
 public interface PurchaseOrdersService {
 
 //    Page<PurchaseOrders> findAllByUserId(Long id, Pageable pageRequest);
@@ -14,6 +16,8 @@ public interface PurchaseOrdersService {
 	void editPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String decodeJwt);
 
 	void approvePurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest, String decodeJwt);
+
+	HashMap findApprovedPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest);
 
 //    Page<Branch> searchBranches(List<SearchColumn> columns, Pageable pageable);
 //
