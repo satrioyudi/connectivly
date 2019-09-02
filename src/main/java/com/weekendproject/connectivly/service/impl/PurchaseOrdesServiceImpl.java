@@ -228,7 +228,7 @@ public class PurchaseOrdesServiceImpl implements PurchaseOrdersService{
 		logService.createLog("approvePurchaseOrder", new Date(), po.getPoNumber(), userName);
 	}
 
-	public HashMap findApprovedPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest) {
+	public HashMap<String, Object> findApprovedPurchaseOrder(@Valid PurchaseOrdersRequest jsonRequest) {
 		List<PurchaseOrders> po = repository.findAllByIsApprovedTrueAndUserId(jsonRequest.getUserId());
 		HashMap<String, Object> map = new HashMap<>();
 		HashMap<String, Object> map1 = new HashMap<>();

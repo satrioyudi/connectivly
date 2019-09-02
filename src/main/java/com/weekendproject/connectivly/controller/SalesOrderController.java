@@ -1,6 +1,7 @@
 package com.weekendproject.connectivly.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -17,10 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.weekendproject.connectivly.model.SalesOrder;
 import com.weekendproject.connectivly.payload.SalesOrderRequest;
 import com.weekendproject.connectivly.repository.SalesOrderRepository;
+import com.weekendproject.connectivly.repository.SalesOrderRepository.SalesOrderViewDetail;
 import com.weekendproject.connectivly.service.SalesOrderService;
-import com.weekendproject.connectivly.model.SalesOrder;
 
 @RestController
 @RequestMapping("/api/salesOrder")
@@ -55,4 +57,15 @@ public class SalesOrderController {
 	public void approveSalesOrder(@Valid @RequestBody SalesOrderRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException{
 		service.approveSalesOrder(jsonRequest, JwtDecoder.decodeJwt(request).get("userId"));
 	}
+	
+	@PostMapping("/viewSalesOrderDetail")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SalesOrderViewDetail> viewPurchaseOrderDetail(@Valid @RequestBody SalesOrderRequest jsonRequest, HttpServletRequest request) throws IOException, JSONException {
+        return repository.viewSalesOrderDetail(JwtDecoder.decodeJwt(request).get("userId"), jsonRequest.getCode());
+    }
+	
+	@GetMapping("/getAllDeliverOrder")
+    public Page<SalesOrder> getAllDeliverOrder(Pageable page, HttpServletRequest request) throws IOException, JSONException {
+        return repository.findAllByUserIdAndIsLinkedAndIsApproved(page, JwtDecoder.decodeJwt(request).get("userId"), "YES", true);
+    }
 }

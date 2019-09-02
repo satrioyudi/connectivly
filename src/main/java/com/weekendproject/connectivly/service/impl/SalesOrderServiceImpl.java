@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.weekendproject.connectivly.model.BackOrder;
 import com.weekendproject.connectivly.model.Products;
 import com.weekendproject.connectivly.model.SalesOrder;
 import com.weekendproject.connectivly.model.SalesOrderProduct;
 import com.weekendproject.connectivly.model.SeqNumber;
 import com.weekendproject.connectivly.payload.SalesOrderRequest;
+import com.weekendproject.connectivly.repository.BackOrderRepository;
 import com.weekendproject.connectivly.repository.ProductRepository;
 import com.weekendproject.connectivly.repository.SalesOrderProductRepository;
 import com.weekendproject.connectivly.repository.SalesOrderRepository;
@@ -41,6 +43,9 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 	
 	@Autowired
 	private ProductRepository prodRepository;
+	
+	@Autowired
+	private BackOrderRepository boRepository;
 	
 	@Override
 	@Transactional
@@ -147,6 +152,7 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 		return sb.toString();
 	}
 
+	@Transactional
 	@Override
 	public void approveSalesOrder(@Valid SalesOrderRequest jsonRequest, String userId) {
 		Optional<SalesOrder> oneByCode = repository.findByCode(jsonRequest.getCode());
@@ -156,6 +162,33 @@ public class SalesOrderServiceImpl implements SalesOrderService{
 			so.setIsApproved(true);
 			
 			repository.save(so);
+			
+			//setInvoiceHere
+			
+			List<SalesOrderProduct> sopList = sopRepository.findAllByCode(so.getCode());
+			if (sopList.size() > 0) {
+				for (SalesOrderProduct salesOrderProduct : sopList) {
+					Optional<Products> p = prodRepository.findById(salesOrderProduct.getProductId());
+					if (p.isPresent()) {
+						Products prod = p.get();
+						int sisa = prod.getQty() - salesOrderProduct.getQuantity();
+						if (sisa < 0) {
+							BackOrder bo = new BackOrder();
+							bo.setBackOrderDate(new Date());
+							bo.setCreatedAt(new Date());
+							bo.setProductId(salesOrderProduct.getProductId());
+							bo.setQuantity(sisa);
+							bo.setUserId(userId);
+//							bo.setDayCounter(dayCounter);
+//							bo.setSalesInvoiceId(salesInvoiceId);
+							
+							boRepository.save(bo);
+						}
+					}
+				}
+				
+			}
+			//set history product
 			
 			logService.createLog("approveSalesOrder", new Date(), jsonRequest.getCode(), userId);
 		}
